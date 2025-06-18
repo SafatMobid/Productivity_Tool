@@ -1,26 +1,56 @@
-import pygame
+import sys
+from PySide6.QtCore import Qt, QPoint
+from PySide6.QtGui import QPainter, QColor, QBrush
+from PySide6.QtWidgets import QApplication, QWidget
 
-pygame.init()
+class BorderlessWindow(QWidget):
+    def __init__(self):
+        super().__init__()
 
-window_size = (600, 600) # Control Window Size
-screen = pygame.display.set_mode((window_size)) #Create window
-#screen = pygame.display.set_mode(window_size, pygame.NOFRAME) #Create borderless screen
+        # Control Window
+        self.setWindowTitle("Borderless_Window")
+        self.setGeometry(10, 100, 600, 800)  # (initial location Left_space, initial location Up_space, Window_length, Window_Height) 
+        self.setWindowFlags(Qt.FramelessWindowHint)  # No borders
+        self.setAttribute(Qt.WA_TranslucentBackground)  # Make window background transparent
+        self.setWindowOpacity(0.9)  # Set window opacity
+        
+        # Store position for dragging
+        self._drag_position = QPoint()
 
-#Using border for now for quicker exit till I create a close button
+    def paintEvent(self, event):
+        painter = QPainter(self)
 
-# Create a semi-transparent black surface
-overlay = pygame.Surface(window_size, pygame.SRCALPHA)
-overlay.fill((0, 0, 0, overlay.full)) #150
+        # Create a semi-transparent black color (alpha 0.5 means 50% transparent)
+        semi_transparent_black = QColor(0, 0, 0, 208)  # (R, G, B, 0-255)
+        
+        # Set the brush and pen for painting
+        painter.setBrush(QBrush(semi_transparent_black))
+        painter.setPen(Qt.transparent)  # Remove border around the surface
+        
+        # Fill the entire window with semi-transparent black color
+        painter.drawRect(self.rect())  # This fills the whole window area
 
-# Draw the overlay on the screen
-screen.blit(overlay, (0,0))
-pygame.display.flip()
+        painter.end()
 
-# Event loop to keep the window open
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+    """ Allows dragging of Window"""
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self._drag_position = event.globalPosition().toPoint()
 
-pygame.quit()
+    def mouseMoveEvent(self, event):
+        if event.buttons() == Qt.LeftButton:
+            delta = event.globalPosition().toPoint() - self._drag_position
+            self.move(self.pos() + delta)
+            self._drag_position = event.globalPosition().toPoint()
+
+
+def main():
+    app = QApplication(sys.argv)
+    # Create and display the window
+    window = BorderlessWindow()
+    window.show()
+    # Run the application's event loop
+    sys.exit(app.exec())
+
+if __name__ == "__main__": 
+    main() #Called to run the application
