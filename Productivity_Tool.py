@@ -1,7 +1,7 @@
 import sys
-from PySide6.QtCore import Qt, QPoint
+from PySide6.QtCore import Qt, QPoint, QTime, QTimer, Slot
 from PySide6.QtGui import QPainter, QColor, QBrush
-from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLCDNumber
 
 class BorderlessWindow(QWidget):
     def __init__(self):
@@ -49,13 +49,44 @@ class BorderlessWindow(QWidget):
             self.move(self.pos() + delta)
             self._drag_position = event.globalPosition().toPoint()
 
+#------------------CLOCK------------------------#
+class DigitalClock(QLCDNumber):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setSegmentStyle(QLCDNumber.SegmentStyle.Filled)
+        self.setDigitCount(8)
+
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.show_time)
+        self.timer.start(1000)
+
+        self.show_time()
+
+        self.setWindowTitle("Digital Clock")
+        self.resize(250, 60)
+
+    @Slot()
+    def show_time(self):
+        time = QTime.currentTime()
+        text = time.toString("hh:mm:ss")
+
+        # Blinking effect
+        if (time.second() % 2) == 0:
+            text = text.replace(":", " ")
+
+        self.display(text)
+#-----------------------CLOCK-----------------------------#
 
 def main():
     app = QApplication(sys.argv)
     # Create and display the window
     window = BorderlessWindow()
     window.show()
-    # Run the application's event loop
+
+    #Clock
+    clock = DigitalClock()
+    clock.show()
+
     sys.exit(app.exec())
 
 if __name__ == "__main__": 
