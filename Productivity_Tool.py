@@ -7,23 +7,32 @@ class BorderlessWindow(QWidget):
     def __init__(self):
         super().__init__()
 
-        # Control Window
+        """ Control Window """
         self.setWindowTitle("Borderless_Window")
-        self.setGeometry(10, 100, 600, 800)  # (initial location Left_space, initial location Up_space, Window_length, Window_Height) 
+        self.setGeometry(1700, 200, 600, 800)  # (initial location Left_space, initial location Up_space, Window_length, Window_Height) 
         self.setWindowFlags(Qt.FramelessWindowHint)  # No borders
         self.setAttribute(Qt.WA_TranslucentBackground)  # Make window background transparent
-        self.setWindowOpacity(0.9)  # Set window opacity
+        self.setWindowOpacity(0.4)  # Set window opacity
         
         # Store position for dragging
         self._drag_position = QPoint()
 
-        # Exit Button
+        """Clock """
+        self.clock = DigitalClock(self)
+        self.clock.setStyleSheet("background-color: transparent; color: white")
+
+
+        """ Exit Button """
         self.exit_button = QPushButton("Exit", self)
         self.exit_button.setStyleSheet("background-color: transparent; color: white; font-size: 20px;") 
         self.exit_button.clicked.connect(self.close)  # Closes window
 
-        # Exit button layout
+        # Exit Button and Clock layout
         layout = QVBoxLayout(self)
+
+        layout.addWidget(self.clock, alignment=Qt.AlignTop | Qt.AlignCenter)
+
+        layout.addStretch()  # pushes the exit button down
         layout.addWidget(self.exit_button)
         layout.setAlignment(Qt.AlignBottom | Qt.AlignRight)  # Where button goes 
         self.setLayout(layout)
@@ -32,7 +41,7 @@ class BorderlessWindow(QWidget):
     def paintEvent(self, event):
         painter = QPainter(self)
         # Set the brush and pen for painting
-        painter.setBrush(QBrush( QColor(0, 0, 0, 205)))  # (R, G, B, 0-255)
+        painter.setBrush(QBrush( QColor(0, 0, 0, 85)))  # (R, G, B, 0-255)
         painter.setPen(Qt.transparent)  # Remove border around the surface
         # Fill the entire window with semi-transparent black color
         painter.drawRect(self.rect())  # This fills the whole window area
@@ -49,33 +58,35 @@ class BorderlessWindow(QWidget):
             self.move(self.pos() + delta)
             self._drag_position = event.globalPosition().toPoint()
 
-#------------------CLOCK------------------------#
+    """CLOCK Functionality"""
 class DigitalClock(QLCDNumber):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setSegmentStyle(QLCDNumber.SegmentStyle.Filled)
         self.setDigitCount(8)
 
+        # Timer to update every second
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.show_time)
         self.timer.start(1000)
 
         self.show_time()
 
-        self.setWindowTitle("Digital Clock")
-        self.resize(250, 60)
+        self.setStyleSheet("font-size: 36px;")  # Change font size here
+        self.setFixedSize(250, 60)
+
 
     @Slot()
     def show_time(self):
         time = QTime.currentTime()
         text = time.toString("hh:mm:ss")
 
-        # Blinking effect
+        # Blinking colon effect
         if (time.second() % 2) == 0:
             text = text.replace(":", " ")
 
         self.display(text)
-#-----------------------CLOCK-----------------------------#
+
 
 def main():
     app = QApplication(sys.argv)
@@ -83,9 +94,6 @@ def main():
     window = BorderlessWindow()
     window.show()
 
-    #Clock
-    clock = DigitalClock()
-    clock.show()
 
     sys.exit(app.exec())
 
