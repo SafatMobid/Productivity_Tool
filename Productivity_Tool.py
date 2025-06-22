@@ -19,8 +19,15 @@ class BorderlessWindow(QWidget):
 
         # Exit Button
         self.exit_button = QPushButton("Exit", self)
-        self.exit_button.setStyleSheet("background-color: gray; color: white; font-size: 18px;") #button design (make transparent?)
+        self.exit_button.setStyleSheet("background-color: transparent; color: white; font-size: 20px;") 
         self.exit_button.clicked.connect(self.close)  # Closes window
+
+        # Exit button layout
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.exit_button)
+        layout.setAlignment(Qt.AlignBottom | Qt.AlignRight)  # Where button goes 
+        self.setLayout(layout)
+
 
     def paintEvent(self, event):
         painter = QPainter(self)
