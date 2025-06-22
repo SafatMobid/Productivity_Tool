@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtCore import Qt, QPoint
 from PySide6.QtGui import QPainter, QColor, QBrush
-from PySide6.QtWidgets import QApplication, QWidget
+from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
 
 class BorderlessWindow(QWidget):
     def __init__(self):
@@ -17,22 +17,21 @@ class BorderlessWindow(QWidget):
         # Store position for dragging
         self._drag_position = QPoint()
 
+        # Exit Button
+        self.exit_button = QPushButton("Exit", self)
+        self.exit_button.setStyleSheet("background-color: gray; color: white; font-size: 18px;") #button design (make transparent?)
+        self.exit_button.clicked.connect(self.close)  # Closes window
+
     def paintEvent(self, event):
         painter = QPainter(self)
-
-        # Create a semi-transparent black color (alpha 0.5 means 50% transparent)
-        semi_transparent_black = QColor(0, 0, 0, 208)  # (R, G, B, 0-255)
-        
         # Set the brush and pen for painting
-        painter.setBrush(QBrush(semi_transparent_black))
+        painter.setBrush(QBrush( QColor(0, 0, 0, 205)))  # (R, G, B, 0-255)
         painter.setPen(Qt.transparent)  # Remove border around the surface
-        
         # Fill the entire window with semi-transparent black color
         painter.drawRect(self.rect())  # This fills the whole window area
-
         painter.end()
 
-    """ Allows dragging of Window"""
+    """ Allows dragging of Window """
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             self._drag_position = event.globalPosition().toPoint()
