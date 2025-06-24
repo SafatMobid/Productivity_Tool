@@ -1,49 +1,51 @@
 import sys
 from PySide6.QtCore import Qt, QPoint, QTime, QTimer, Slot
 from PySide6.QtGui import QPainter, QColor, QBrush
-from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLCDNumber
+from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLCDNumber, QHBoxLayout
 
 class BorderlessWindow(QWidget):
     def __init__(self):
         super().__init__()
 
-        """ Control Window """
+        """ Program Window Setting"""
         self.setWindowTitle("Borderless_Window")
         self.setGeometry(1700, 200, 600, 800)  # (initial location Left_space, initial location Up_space, Window_length, Window_Height) 
-        self.setWindowFlags(Qt.FramelessWindowHint)  # No borders
-        self.setAttribute(Qt.WA_TranslucentBackground)  # Make window background transparent
-        self.setWindowOpacity(0.4)  # Set window opacity
-        
-        # Store position for dragging
+        self.setWindowFlags(Qt.FramelessWindowHint) 
+        self.setAttribute(Qt.WA_TranslucentBackground) 
+        self.setWindowOpacity(0.4)  
         self._drag_position = QPoint()
 
-        """Clock """
+        """ Clock """
         self.clock = DigitalClock(self)
-        self.clock.setStyleSheet("background-color: transparent; color: white")
+        self.clock.setStyleSheet("background-color: transparent; color: White")
 
 
         """ Exit Button """
         self.exit_button = QPushButton("Exit", self)
         self.exit_button.setStyleSheet("background-color: transparent; color: white; font-size: 20px;") 
-        self.exit_button.clicked.connect(self.close)  # Closes window
+        self.exit_button.clicked.connect(self.close) 
 
         # Exit Button and Clock layout
-        layout = QVBoxLayout(self)
+        clock_layout = QVBoxLayout()
+        clock_layout.addWidget(self.clock, alignment=Qt.AlignCenter)  
+  
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(self.exit_button, alignment=Qt.AlignRight | Qt.AlignBottom)
 
-        layout.addWidget(self.clock, alignment=Qt.AlignTop | Qt.AlignCenter)
+        main_layout = QVBoxLayout(self)
+        main_layout.addLayout(clock_layout) 
+        main_layout.addStretch(1) 
+        main_layout.addLayout(button_layout)  
 
-        layout.addStretch()  # pushes the exit button down
-        layout.addWidget(self.exit_button)
-        layout.setAlignment(Qt.AlignBottom | Qt.AlignRight)  # Where button goes 
-        self.setLayout(layout)
+        self.setLayout(main_layout)
 
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        # Set the brush and pen for painting
+
         painter.setBrush(QBrush( QColor(0, 0, 0, 85)))  # (R, G, B, 0-255)
-        painter.setPen(Qt.transparent)  # Remove border around the surface
-        # Fill the entire window with semi-transparent black color
+        painter.setPen(Qt.transparent) 
+
         painter.drawRect(self.rect())  # This fills the whole window area
         painter.end()
 
@@ -71,15 +73,15 @@ class DigitalClock(QLCDNumber):
         self.timer.start(1000)
 
         self.show_time()
-
-        self.setStyleSheet("font-size: 36px;")  # Change font size here
-        self.setFixedSize(250, 60)
+        self.setFixedSize(276, 222)
 
 
     @Slot()
     def show_time(self):
         time = QTime.currentTime()
-        text = time.toString("hh:mm:ss")
+        text = time.toString("hh:mm:ss AP")
+
+        self.setDigitCount(11)
 
         # Blinking colon effect
         if (time.second() % 2) == 0:
@@ -90,7 +92,7 @@ class DigitalClock(QLCDNumber):
 
 def main():
     app = QApplication(sys.argv)
-    # Create and display the window
+
     window = BorderlessWindow()
     window.show()
 
@@ -98,4 +100,4 @@ def main():
     sys.exit(app.exec())
 
 if __name__ == "__main__": 
-    main() #Called to run the application
+    main() 
