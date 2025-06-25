@@ -14,8 +14,19 @@ class BorderlessWindow(QWidget):
         self.setGeometry(1700, 200, 460, 800)  # (initial location Left_space, initial location Up_space, Window_length, Window_Height) 
         self.setWindowFlags(Qt.FramelessWindowHint) 
         self.setAttribute(Qt.WA_TranslucentBackground) 
-        self.setWindowOpacity(0.4)  
+        self.setWindowOpacity(0.4)
+        
+        self.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+        self.setWindowTitle("Always on Top Window") 
         self._drag_position = QPoint()
+
+        #Doesnt work, may be some use
+        # self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        # self.setWindowFlag(Qt.FramelessWindowHint, True)
+
+        #Works but if window is click through it none draggable or exitable(Exploring options)
+        # self.setWindowFlags(Qt.FramelessWindowHint |Qt.WindowStaysOnTopHint |Qt.WindowTransparentForInput)
+
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -24,7 +35,7 @@ class BorderlessWindow(QWidget):
         painter.drawRect(self.rect())
         painter.end()
 
-        """ Clock """
+        """ Clock Style"""
         self.clock = DigitalClock(self)
         self.clock.setStyleSheet("background-color: transparent; color: White;")
 
