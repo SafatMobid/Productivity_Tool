@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtCore import Qt, QPoint
 from PySide6.QtGui import QPainter, QColor, QBrush
-from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout
+from PySide6.QtWidgets import * 
 
 from clock import DigitalClock
 
@@ -11,23 +11,33 @@ class BorderlessWindow(QWidget):
 
         """ Program Window Setting"""
         self.setWindowTitle("Borderless_Window")
-        self.setGeometry(1700, 200, 600, 800)  # (initial location Left_space, initial location Up_space, Window_length, Window_Height) 
+        self.setGeometry(1700, 200, 460, 800)  # (initial location Left_space, initial location Up_space, Window_length, Window_Height) 
         self.setWindowFlags(Qt.FramelessWindowHint) 
         self.setAttribute(Qt.WA_TranslucentBackground) 
         self.setWindowOpacity(0.4)  
         self._drag_position = QPoint()
 
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setBrush(QBrush( QColor(0, 0, 0, 85)))  # (R, G, B, 0-255)
+        painter.setPen(Qt.transparent) 
+        painter.drawRect(self.rect())
+        painter.end()
+
         """ Clock """
         self.clock = DigitalClock(self)
-        self.clock.setStyleSheet("background-color: transparent; color: White")
+        self.clock.setStyleSheet("background-color: transparent; color: White;")
 
+        # opacity_effect = QGraphicsOpacityEffect(self.clock)
+        # opacity_effect.setOpacity(1)
+        # self.clock.setGraphicsEffect(opacity_effect)
 
         """ Exit Button """
         self.exit_button = QPushButton("Exit", self)
         self.exit_button.setStyleSheet("background-color: transparent; color: white; font-size: 20px;") 
         self.exit_button.clicked.connect(self.close) 
 
-        # Exit Button and Clock layout
+        """ Exit Button and Clock layout """
         clock_layout = QVBoxLayout()
         clock_layout.addWidget(self.clock, alignment=Qt.AlignCenter)  
   
@@ -41,16 +51,6 @@ class BorderlessWindow(QWidget):
 
         self.setLayout(main_layout)
 
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-
-        painter.setBrush(QBrush( QColor(0, 0, 0, 85)))  # (R, G, B, 0-255)
-        painter.setPen(Qt.transparent) 
-
-        painter.drawRect(self.rect())  # This fills the whole window area
-        painter.end()
-
     """ Allows dragging of Window """
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -62,14 +62,10 @@ class BorderlessWindow(QWidget):
             self.move(self.pos() + delta)
             self._drag_position = event.globalPosition().toPoint()
 
-
-
 def main():
     app = QApplication(sys.argv)
-
     window = BorderlessWindow()
     window.show()
-
 
     sys.exit(app.exec())
 
