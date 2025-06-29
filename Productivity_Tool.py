@@ -16,7 +16,8 @@ class BorderlessWindow(QWidget):
         self.setAttribute(Qt.WA_TranslucentBackground) 
         self.setWindowOpacity(0.4)
         
-        self.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+        self.setWindowFlag(Qt.WindowStaysOnTopHint, True | Qt.WindowStaysOnTopHint | Qt.Tool)
+        self.show()
         self.setWindowTitle("Always on Top Window") 
         self._drag_position = QPoint()
 
