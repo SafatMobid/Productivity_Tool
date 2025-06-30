@@ -60,14 +60,15 @@ class BorderlessWindow(QWidget):
 
     """ Allows dragging of Window """
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.LeftButton and event.pos().y() < 100:
             self._drag_position = event.globalPosition().toPoint()
 
     def mouseMoveEvent(self, event):
         if event.buttons() == Qt.LeftButton:
-            delta = event.globalPosition().toPoint() - self._drag_position
-            self.move(self.pos() + delta)
-            self._drag_position = event.globalPosition().toPoint()
+            if event.pos().y() < 100:
+                delta = event.globalPosition().toPoint() - self._drag_position
+                self.move(self.pos() + delta)
+                self._drag_position = event.globalPosition().toPoint()
 
 def main():
     app = QApplication(sys.argv)
