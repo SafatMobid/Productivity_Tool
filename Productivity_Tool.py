@@ -10,7 +10,7 @@ class TransparentBackground(QWidget):
         super().__init__(parent)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setGeometry(parent.rect())
-        # self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents)
 
 
     def paintEvent(self, event):
@@ -65,12 +65,12 @@ class BorderlessWindow(QWidget):
         
     """ Allows dragging of Window """
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton and event.pos().y() < 100:
+        if event.button() == Qt.LeftButton and event.position().y() < 100:
             self._drag_position = event.globalPosition().toPoint()
 
     def mouseMoveEvent(self, event):
         if event.buttons() == Qt.LeftButton:
-            if event.pos().y() < 100:
+            if event.position().y() < 100:
                 delta = event.globalPosition().toPoint() - self._drag_position
                 self.move(self.pos() + delta)
                 self._drag_position = event.globalPosition().toPoint()
