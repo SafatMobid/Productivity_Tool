@@ -75,19 +75,18 @@ class BorderlessWindow(QWidget):
 
         self.timer_window = None # Need to initialize timer or else error
         
-    """ Allows dragging of Window """
+    """ Allows dragging of Window from clock area """
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton and event.position().y() < 100:
+        if event.button() == Qt.LeftButton and self.clock.geometry().contains(event.position().toPoint()):
             self._drag_position = event.globalPosition().toPoint()
         else:
             event.ignore()
 
     def mouseMoveEvent(self, event):
-        if event.buttons() == Qt.LeftButton:
-            if event.position().y() < 100:
-                delta = event.globalPosition().toPoint() - self._drag_position
-                self.move(self.pos() + delta)
-                self._drag_position = event.globalPosition().toPoint()
+        if event.buttons() == Qt.LeftButton and self.clock.geometry().contains(event.position().toPoint()):
+            delta = event.globalPosition().toPoint() - self._drag_position
+            self.move(self.pos() + delta)
+            self._drag_position = event.globalPosition().toPoint()
         else:
             event.ignore()
 
