@@ -4,6 +4,7 @@ from PySide6.QtGui import QPainter, QColor, QBrush
 from PySide6.QtWidgets import * 
 
 from clock import DigitalClock
+from timer import AttachedTimerWindow
 
 class TransparentBackground(QWidget):
     def __init__(self, parent=None):
@@ -26,7 +27,7 @@ class BorderlessWindow(QWidget):
         """ Program Window Setting"""
         self.setWindowTitle("Borderless_Window")
         self.setGeometry(1700, 200, 460, 800)  # (Left_space, Up_space, Win_wid, Win_len) 
-        self.setWindowFlags(Qt.FramelessWindowHint| Qt.WindowStaysOnTopHint| Qt.Tool) #| Qt.WindowTransparentForInput) 
+        self.setWindowFlags(Qt.FramelessWindowHint| Qt.WindowStaysOnTopHint| Qt.Tool)#| Qt.WindowTransparentForInput) 
         self.setAttribute(Qt.WA_TranslucentBackground) 
         self.setWindowOpacity(0.4)
         self._drag_position = QPoint()
@@ -42,9 +43,14 @@ class BorderlessWindow(QWidget):
         self.header.setGeometry(0, 0, self.width(), 100)
         self.header.setStyleSheet("background-color: transparent;")
 
-        """ Clock Style"""
+        """ Clock """
         self.clock = DigitalClock(self)
         self.clock.setStyleSheet("background-color: transparent; color: White;")
+
+        """ Timer """
+        self.timer_button = QPushButton("Timer", self)
+        self.timer_button.clicked.connect(self.open_timer_window) 
+        self.timer_button.setStyleSheet(" background-color: transparent; color: white; font-size: 20px;")
 
         """ Exit Button """
         self.exit_button = QPushButton("Exit", self)
@@ -66,6 +72,8 @@ class BorderlessWindow(QWidget):
         main_layout.addLayout(button_layout)  
 
         self.setLayout(main_layout)
+
+        self.timer_window = None # Need to initialize timer or else error
         
     """ Allows dragging of Window """
     def mousePressEvent(self, event):
@@ -82,6 +90,21 @@ class BorderlessWindow(QWidget):
                 self._drag_position = event.globalPosition().toPoint()
         else:
             event.ignore()
+
+    def open_timer_window(self):  # Open Timer Window
+        if self.timer_window is None:  # Check if window is already open
+            print("Timer button clicked!")
+            self.timer_window = AttachedTimerWindow(self)  # Create an instance of AttachedTimerWindow
+
+            # Set the geometry of the timer window so it’s visible (ensure it's not off-screen)
+            self.timer_window.move(self.x() + self.width(), self.y())  # Place it to the right of the parent window
+            self.timer_window.resize(300, 400)  # Set the size of the timer window
+
+            self.timer_window.show()  # Show the attached timer window
+        else:
+            print("Timer window is already open.")  # Prevent reopening if it's already opened
+
+
 def main():
     app = QApplication(sys.argv)
     window = BorderlessWindow()
