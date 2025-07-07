@@ -10,12 +10,11 @@ class TransparentBackground(QWidget):
         super().__init__(parent)
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setGeometry(parent.rect())
-        self.setAttribute(Qt.WA_TransparentForMouseEvents)
-
+        #self.setAttribute(Qt.WA_TransparentForMouseEvents)
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setBrush(QBrush( QColor(0, 0, 0, 85)))  # (R, G, B, 0-255)
+        painter.setBrush(QBrush(QColor(0, 0, 0, 85)))  # (R, G, B, 0-255)
         painter.setPen(Qt.transparent) 
         painter.drawRect(self.rect())
         painter.end()
@@ -27,17 +26,21 @@ class BorderlessWindow(QWidget):
         """ Program Window Setting"""
         self.setWindowTitle("Borderless_Window")
         self.setGeometry(1700, 200, 460, 800)  # (Left_space, Up_space, Win_wid, Win_len) 
-        self.setWindowFlags(Qt.FramelessWindowHint| Qt.WindowStaysOnTopHint| Qt.Tool) 
+        self.setWindowFlags(Qt.FramelessWindowHint| Qt.WindowStaysOnTopHint| Qt.Tool) #| Qt.WindowTransparentForInput) 
         self.setAttribute(Qt.WA_TranslucentBackground) 
         self.setWindowOpacity(0.4)
         self._drag_position = QPoint()
 
-        # self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        #self.setAttribute(Qt.WA_TransparentForMouseEvents)
         
         self.background = TransparentBackground(self)
         self.background.lower() 
 
-        self.setWindowFlags(Qt.FramelessWindowHint |Qt.WindowStaysOnTopHint |Qt.WindowTransparentForInput)
+        # self.setAttribute(Qt.WA_TransparentForMouseEvents)
+
+        self.header = QWidget(self)
+        self.header.setGeometry(0, 0, self.width(), 100)
+        self.header.setStyleSheet("background-color: transparent;")
 
         """ Clock Style"""
         self.clock = DigitalClock(self)
@@ -47,7 +50,8 @@ class BorderlessWindow(QWidget):
         self.exit_button = QPushButton("Exit", self)
         self.exit_button.clicked.connect(self.close)
         self.exit_button.setStyleSheet("background-color: transparent; color: white; font-size: 20px;") 
-        self.exit_button.clicked.connect(self.close) 
+        
+        # self.exit_button.setAttribute(Qt.WA_TransparentForMouseEvents, False)
 
         """ Exit Button and Clock layout """
         clock_layout = QVBoxLayout()
@@ -67,6 +71,8 @@ class BorderlessWindow(QWidget):
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton and event.position().y() < 100:
             self._drag_position = event.globalPosition().toPoint()
+        else:
+            event.ignore()
 
     def mouseMoveEvent(self, event):
         if event.buttons() == Qt.LeftButton:
@@ -74,10 +80,8 @@ class BorderlessWindow(QWidget):
                 delta = event.globalPosition().toPoint() - self._drag_position
                 self.move(self.pos() + delta)
                 self._drag_position = event.globalPosition().toPoint()
-
-    # def mousePressEvent(self, event):
-    #     print("Background clicked")
-
+        else:
+            event.ignore()
 def main():
     app = QApplication(sys.argv)
     window = BorderlessWindow()
